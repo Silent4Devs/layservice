@@ -38,7 +38,7 @@ sin tesseract.
 Para lograr que el bot funcione,deberas ir al archivo "Bot_layla_sphere.py" y dentro de el, 
 abre tu terminal(ctrl+ñ) y despues escribir el siguiente comando:
 
-streamlit run Bot_layla_sphere.py
+streamlit run main.py
 
 Esto en cuyo caso el nombre del archivo no cambie conforme pase el tiempo.
 
@@ -85,3 +85,5 @@ Las cosas faltantes para lanzar el bot era estructurar una database dentro del b
 pip install langchain_openai
 
 pip install langchain --upgrade
+
+pip install wikipedia

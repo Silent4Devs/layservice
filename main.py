@@ -3,7 +3,7 @@ import chromadb
 import openai
 import os 
 from fastapi import FastAPI
-from langchain.agents import AgentExecutor, tool
+from langchain.agents import AgentExecutor,tool
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.schema import HumanMessage, SystemMessage
@@ -25,10 +25,10 @@ import shutil
 # Para instalar teseract deberas hacer los pasos que se realizan en el siguiente link: https://www.youtube.com/watch?v=3Q1gTDXzGnU&t=12s
 # si tienes ubuntu ejecuta en la terminal "sudo apt-get install tesseract-ocr"
 
-# Al finalizar utiliza el comando que se encuenta en \Layla_Sphere\zona de pruebas\Conseguir_Rutas.ipynb para verificar
+# Al finalizar utiliza el comando que se encuenta en /Conseguir_Rutas.ipynb para verificar
 # que la ruta esta correctamente implementada, al finalizar, solo pega la ruta en el codigo que se encuentra abajo
 
-pytesseract.pytesseract.tesseract_cmd = "/home/normam/.local/lib/python3.10/site-packages/tesseract"
+#pytesseract.pytesseract.tesseract_cmd = os.environ["UBI_TESSERACT"]
 
 ### CARGAR DOCUMENTOS ###
 
@@ -269,11 +269,10 @@ if __name__ == "__main__":
             h = st.session_state.history
            
  
-          
-            
-          
+                
             
 
 load_dotenv(find_dotenv(),override=True)
 def OPENAI_API_KEY(self):
     return os.environ.get("OPENAI_API_KEY", "")
+
