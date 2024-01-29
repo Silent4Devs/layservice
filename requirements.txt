@@ -12,3 +12,5 @@ pdf2image
 tesseract
 unstructured_inference
 pdfminer.six
+pinecone-client
+python-dotenv
