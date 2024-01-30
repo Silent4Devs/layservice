@@ -87,3 +87,7 @@ pip install langchain_openai
 pip install langchain --upgrade
 
 pip install wikipedia
+
+pip install pymupdf
+
+pip install bert-extractive-summarizer

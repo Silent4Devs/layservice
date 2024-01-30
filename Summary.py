@@ -1,51 +1,96 @@
 import os
 from dotenv import load_dotenv, find_dotenv
-from langchain_openai import ChatOpenAI
-from langchain_community.chat_models import ChatOpenAI  #
+from langchain_openai import ChatOpenAI  #
 from langchain.schema import AIMessage, HumanMessage, SystemMessage    #
-from langchain_community.llms import OpenAI
+from langchain_community.llms import openai
 from langchain.prompts import PromptTemplate        #
 from langchain.chains.summarize import load_summarize_chain     #
 from langchain.docstore.document import Document    #
 from langchain.text_splitter import RecursiveCharacterTextSplitter      #
 from langchain.chains import LLMChain, SimpleSequentialChain
+from decouple import config  
+from PyPDF2 import PdfReader
+from typing_extensions import Concatenate
 import chardet
+
+# load_dotenv(find_dotenv(),override=True)
+# def OPENAI_API_KEY(self):
+#     return os.environ.get("OPENAI_API_KEY", "")
+
+
+OPENAI_API_KEY=os.getenv('OPENAI_API_KEY')
+llm=ChatOpenAI(OPENAI_API_KEY=config("OPENAI_API_KEY"),temperature=0.7, model_name="text-embedding-ada-002")
+
+pdfreader=PdfReader('notas.pdf')
+
+text=''
+for i, page in enumerate(pdfreader.pages):
+    content=page.extract_text()
+    content= page.extract_text()
+    if content:
+        text +=content
+        
+
+
+
+
+chat_messages=[
+    SystemMessage(content='Eres una asistente virtual llamada Lay, eres cómica, carismatica, interesante y amable, no menciones tus cualidades, que apoya encontrando información, además de dar sugerencias en base a la información que se te proporcione'),
+    HumanMessage(content=f'Haz un resumen breve y conciso del texto :\n Text:{text}')
+]
+
 
 with open('notas.pdf','r', encoding='utf-8', errors='ignore') as f:
     text=f.read()
     
-llm=ChatOpenAI(temperature=0.7, model_name="text-embedding-ada-002")
-   
+  
+llm.get_num_tokens(text)  
 
-map_prompt='''
-Hazme un resumen breve y conciso del texto :{text}, 
-El resumen que esté en español.
+llm(chat_messages).content 
+
+print(llm(chat_messages).content)
+  
+  
+
+generic_template='''
+Haz un resumen breve y conciso del texto :{text}, 
+Texto: {text}
+Idioma: {language}
 '''
-map_prompt_template=PromptTemplate(
-    input_variables=['text'],
-    template=map_prompt
+prompt=PromptTemplate(
+    input_variables=['text','language'],
+    template=generic_template
     )
+prompt.format(text=text,language='Español')
 
-prompt_complete='''
-Escribe un resumen breve y conciso del texto :{text}, que abarque los puntos clave 
-Agrega un título al resumen , que el resumen comience con una introducción y marque 
-los puntos importantes tipo "BULLET Point" , y termina el resumen con una conclusión
-Text:{text}
-'''
-prompt_template_combine=PromptTemplate(template=prompt_complete, input_variables=['text'])
-
-    
 chain=load_summarize_chain(
     llm=llm,
     chain_type='map_reduce',
-    map_prompt= map_prompt_template,
-    combine_prompt=prompt_template_combine,
+    prompt=prompt,
     verbose=False
 )
+output_summary=chain.run(docs)
 
-summary=prompt_template_combine.run(chunks)
 
-print(summary)
+complete_prompt=prompt.format(text=text, language='Español')
+
+llm.get_num_tokens(complete_prompt) 
+
+llm_chain=LLMChain(llm=llm, prompt=prompt)
+summary= llm_chain.run({'text':text, 'language':'Español'})
+
+summary
+
+# prompt_template:str='''
+# Escribe un resumen breve y conciso del texto {text}, que abarque los puntos clave 
+# Agrega un título al resumen , que el resumen comience con una introducción y marque 
+# '''
+# prompt_template_combine=PromptTemplate.from_template(template=prompt_template, input_var=['text'])
+
+    
+
+
+# print(prompt_template_combine.template)
 
 
 
