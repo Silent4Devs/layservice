@@ -1,8 +1,9 @@
 import os
+#import openai
 from dotenv import load_dotenv, find_dotenv
-from langchain_openai import ChatOpenAI  #
+from langchain_openai import OpenAI  #
 from langchain.schema import AIMessage, HumanMessage, SystemMessage    #
-from langchain_community.llms import openai
+from langchain_community.llms import OpenAI
 from langchain.prompts import PromptTemplate        #
 from langchain.chains.summarize import load_summarize_chain     #
 from langchain.docstore.document import Document    #
@@ -18,15 +19,14 @@ import chardet
 #     return os.environ.get("OPENAI_API_KEY", "")
 
 
-OPENAI_API_KEY=os.getenv('OPENAI_API_KEY')
-llm=ChatOpenAI(OPENAI_API_KEY=config("OPENAI_API_KEY"),temperature=0.7, model_name="text-embedding-ada-002")
+llm= OpenAI(openai_api_key="OPENAI_API_KEY",temperature=0.7, model_name="text-embedding-ada-002")
 
 pdfreader=PdfReader('notas.pdf')
 
-text=''
+text='pdfreader'
+
 for i, page in enumerate(pdfreader.pages):
     content=page.extract_text()
-    content= page.extract_text()
     if content:
         text +=content
         
@@ -57,26 +57,26 @@ Haz un resumen breve y conciso del texto :{text},
 Texto: {text}
 Idioma: {language}
 '''
-prompt=PromptTemplate(
+prompts=PromptTemplate(
     input_variables=['text','language'],
     template=generic_template
     )
-prompt.format(text=text,language='Español')
+prompts.format(text=text,language='Español')
 
 chain=load_summarize_chain(
     llm=llm,
     chain_type='map_reduce',
-    prompt=prompt,
+    prompt=prompts,
     verbose=False
 )
 output_summary=chain.run(docs)
 
 
-complete_prompt=prompt.format(text=text, language='Español')
+complete_prompt=prompts.format(text=text, language='Español')
 
 llm.get_num_tokens(complete_prompt) 
 
-llm_chain=LLMChain(llm=llm, prompt=prompt)
+llm_chain=LLMChain(llm=llm, prompt=prompts)
 summary= llm_chain.run({'text':text, 'language':'Español'})
 
 summary
