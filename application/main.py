@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     load_dotenv(find_dotenv(), override=True)
 
-    st.image("s4b_logo.png")
+    st.image("public/s4b_logo.png")
     st.subheader(
         "¡Hola usuario!, mi nombre es Lay Sphere🤖, fui diseñada por silent4business para analizar los documentos que me proporciones y me preguntes sobre ellos y te responda con mucho gusto 😀, dicho lo anterior, porfavor..."
     )
