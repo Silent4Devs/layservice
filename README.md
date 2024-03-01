@@ -70,7 +70,6 @@ conversación antes de realizar nuevas preguntas.
 Para finalizar, cuando le des clic al boton add data, espera a que cargue la info y despues
 escribe lo que le quieras preguntar al bot respecto al documento seleccionado.
 
-
 ###COMENTARIOS ADICIONALES###
 
 El bot tiene documentos adicionales en la carpeta, que son para localizar paths, otras versiones del bot, estas las encuentras en la carpeta "Zona de pruebas",
