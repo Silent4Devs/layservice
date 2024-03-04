@@ -1,5 +1,3 @@
-# main.py
-
 from adapters.streamlit_adapter import main
 
 if __name__ == "__main__":
