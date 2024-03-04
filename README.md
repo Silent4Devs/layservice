@@ -20,7 +20,7 @@ pdfminer.six
 
 Si es tu primera vez usandolo, deberas instalarlas, para instalarlas todas al instante, abre tu terminal y escribe el siguiente comando:
 
-pip install -r requirements.txt
+pip install requirements.txt
 
 De no correr directamente utiliza
 
@@ -86,3 +86,7 @@ pip install langchain_openai
 pip install langchain --upgrade
 
 pip install wikipedia
+
+pip3 install streamlit
+
+pip install pymupdf
