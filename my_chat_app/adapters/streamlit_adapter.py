@@ -1,5 +1,4 @@
 # adapters/streamlit_adapter.py
-
 import streamlit as st
 from application.use_cases import upload_document, answer_question
 from domain.document import DocumentInfo
