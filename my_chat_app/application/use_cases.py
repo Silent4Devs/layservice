@@ -3,8 +3,11 @@ from domain.document import DocumentInfo
 from domain.document import DocumentInfo
 from infrastructure.repositories import Repository
 
-def upload_document_interface(bytes_data: bytes, question: str = "") -> DocumentInfo:
-    return load_document_from_upload(bytes_data, question)
+# application/use_cases.py
+from domain.document import DocumentInfo
+
+def upload_document_interface(bytes_data: bytes) -> DocumentInfo:
+    return load_document_from_upload(bytes_data)
 
 def answer_question_interface(question: str, document_info: DocumentInfo, repository: Repository) -> str:
     if question.lower() == "hola":
