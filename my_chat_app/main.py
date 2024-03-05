@@ -1,5 +1,4 @@
-import streamlit as st
-from adapters.streamlit_adapter import main
+from adapters.streamlit_adapter import run
 
 if __name__ == "__main__":
-    main()
+    run()
