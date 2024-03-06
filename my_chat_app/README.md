@@ -20,7 +20,7 @@ pdfminer.six
 
 Si es tu primera vez usandolo, deberas instalarlas, para instalarlas todas al instante, abre tu terminal y escribe el siguiente comando:
 
-pip install -r requirements.txt
+pip install requirements.txt
 
 De no correr directamente utiliza
 
@@ -38,7 +38,7 @@ sin tesseract.
 Para lograr que el bot funcione,deberas ir al archivo "Bot_layla_sphere.py" y dentro de el, 
 abre tu terminal(ctrl+ñ) y despues escribir el siguiente comando:
 
-streamlit run main.py
+streamlit run my_chat_app/main.py
 
 Esto en cuyo caso el nombre del archivo no cambie conforme pase el tiempo.
 
@@ -70,7 +70,6 @@ conversación antes de realizar nuevas preguntas.
 Para finalizar, cuando le des clic al boton add data, espera a que cargue la info y despues
 escribe lo que le quieras preguntar al bot respecto al documento seleccionado.
 
-
 ###COMENTARIOS ADICIONALES###
 
 El bot tiene documentos adicionales en la carpeta, que son para localizar paths, otras versiones del bot, estas las encuentras en la carpeta "Zona de pruebas",
@@ -87,3 +86,7 @@ pip install langchain_openai
 pip install langchain --upgrade
 
 pip install wikipedia
+
+pip3 install streamlit
+
+pip install pymupdf
