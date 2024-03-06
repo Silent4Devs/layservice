@@ -1,8 +1,8 @@
 import streamlit as st
 from domain.document_loaders  import load_document
 from domain.text_chunker import chunk_data
-from domain.embeddings import create_embeddings
-from domain.question_answer import ask_and_get_answer
+from infrastructure.embeddings import create_embeddings
+from application.use_cases import ask_and_get_answer
 from domain.cost_calculator import calculate_embedding_cost
 from domain.memory import clear_history, ask_with_memory
 import os
