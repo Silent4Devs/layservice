@@ -25,6 +25,10 @@ def run():
         unsafe_allow_html=True,
     )
     with st.sidebar:
+        from dotenv import load_dotenv
+        
+        load_dotenv()
+
         api_key = os.environ["OPENAI_API_KEY"]
 
         uploaded_file = st.file_uploader(
