@@ -1,91 +1,67 @@
 import streamlit as st
-from domain.document_loaders  import load_document
-from domain.text_chunker import chunk_data
-from infrastructure.embeddings import create_embeddings
-from application.use_cases import ask_and_get_answer
-from domain.cost_calculator import calculate_embedding_cost
-from domain.memory import clear_history, ask_with_memory
 import os
+from domain.utils import *
+from langchain.embeddings import HuggingFaceEmbeddings 
+from langchain.chat_models import ChatOpenAI
+from langchain.chains.question_answering import load_qa_chain
+
+OPENAI_API_KEY = "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"
 
 def run():
-    st.image("my_chat_app/public/s4b_logo.png")
-    st.subheader(
-        "¡Hola usuario!, mi nombre es Lay Sphere🤖, fui diseñada por silent4business para analizar los documentos que me proporciones y me preguntes sobre ellos y te responda con mucho gusto 😀, dicho lo anterior, porfavor..."
-    )
-    background_image_path = os.path.join(os.getcwd(), "fondo_layla_sphere.jpg")
-    st.markdown(
-        f"""
-        <style>
-        body {{
-            background-image: url("{background_image_path}");
-            background-size: cover;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+
+    st.set_page_config('preguntaDOC')
+    st.header("¡Hola usuario!, mi nombre es Lay Sphere🤖, fui diseñada por silent4business para analizar los documentos que me proporciones y me preguntes sobre ellos y te responda con mucho gusto 😀, dicho lo anterior, porfavor...")
+
+
     with st.sidebar:
-        from dotenv import load_dotenv
         
-        load_dotenv()
-
-        api_key = os.environ["OPENAI_API_KEY"]
-
-        uploaded_file = st.file_uploader(
-            "Upload a file:", type=["pdf", "docx", "txt", "pptx", "jpg", "png"]
-        )
-        chunk_size = st.number_input(
-            "Chunk size:",
-            min_value=100,
-            max_value=2048,
-            value=512,
-            on_change=clear_history,
-        )
-        k = st.number_input(
-            "k", min_value=1, max_value=20, value=3, on_change=clear_history
-        )
-        add_data = st.button("Add Data", on_click=clear_history)
-
-        if uploaded_file and add_data:
-            with st.spinner("Reading, chunking and embedding file ..."):
-                bytes_data = uploaded_file.read()
-                file_name = os.path.join("./", uploaded_file.name)
-                with open(file_name, "wb") as f:
-                    f.write(bytes_data)
-
-            data = load_document(file_name)
-            chunks = chunk_data(data, chunk_size=chunk_size)
-            st.write(f"Chunk size: {chunk_size}, Chunks: {len(chunks)}")
-
-            tokens, embedding_cost = calculate_embedding_cost(chunks)
-            st.write(f"Embedding cost: ${embedding_cost:.4f}")
-
-            vector_store = create_embeddings(chunks)
-            st.session_state.vs = vector_store
-            st.session_state.chat_history = []
-
-            st.session_state.vs = vector_store
-            st.success("File uploaded, chunked and embedded sucessfully")
-
-    q = st.text_input("Haz una pregunta acerca del contenido de tu archivo 😀")
-    if q:
-        if "vs" in st.session_state:
-            vector_store = st.session_state.vs
-            st.write(f"k: {k}")
-            result, st.session_state.chat_history = ask_with_memory(
-                vector_store, q, st.session_state.chat_history
+        archivos = load_name_files(FILE_LIST)
+        files_uploaded = st.file_uploader(
+            "Carga tu archivo",
+            type="pdf",
+            accept_multiple_files=True
             )
-            answer = result["answer"]
-            st.text_area("LLM Answer: ", value=answer)
+        
+        if st.button('Procesar'):
+            for pdf in files_uploaded:
+                if pdf is not None and pdf.name not in archivos:
+                    archivos.append(pdf.name)
+                    text_to_chromadb(pdf)
 
-            st.divider()
-            if "history" not in st.session_state:
-                st.session_state.history = ""
-            value = f"Q: {q} \nA: {answer}"
-            st.session_state.history = (
-                f'{value} \n {"-" * 100} \n {st.session_state.history}'
-            )
-            h = st.session_state.history
+            archivos = save_name_files(FILE_LIST, archivos)
+
+        if len(archivos) > 0:
+            st.write("Archivos cargados:")
+            lista_documentos = st.empty()
+            with lista_documentos.container():
+                for arch in archivos:
+                    st.write(arch)
+                if st.button('Borrar documentos'):
+                    archivos = []
+                    clean_files(FILE_LIST)
+                    lista_documentos.empty()
+
+    if archivos:
+        user_question = st.text_input("Pregunta:")
+        if user_question:
+            os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+            embeddings = HuggingFaceEmbeddings(
+                model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+                )
+            
+            vstore = Chroma(client=chroma_client,
+                            collection_name=INDEX_NAME,
+                            embedding_function=embeddings)
+
+            docs = vstore.similarity_search(user_question, 3)
+            llm = ChatOpenAI(model_name='gpt-3.5-turbo')
+            chain = load_qa_chain(llm, chain_type="stuff")
+            respuesta = chain.run(input_documents=docs, question=user_question)
+
+            st.write(respuesta)
+
+
+    
 
 if __name__ == "__main__":
     run()
