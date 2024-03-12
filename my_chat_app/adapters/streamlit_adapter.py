@@ -5,8 +5,6 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.question_answering import load_qa_chain
 
-OPENAI_API_KEY = "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"
-
 def run():
 
     st.set_page_config('preguntaDOC')
@@ -44,7 +42,7 @@ def run():
     if archivos:
         user_question = st.text_input("Pregunta:")
         if user_question:
-            os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+            os.environ["OPENAI_API_KEY"]
             embeddings = HuggingFaceEmbeddings(
                 model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
                 )
