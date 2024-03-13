@@ -4,6 +4,7 @@ services:
     build:
       context: "."
       dockerfile: Dockerfile
+    container_name: lay-chat-app
     image: langchain-chat-app:latest
     # command: streamlit run main.py --server.port 8080
     volumes:
@@ -12,7 +13,8 @@ services:
     - 8080:8080
     networks:
       - lay-networks
-  chromadb:
+  chroma-lay:
+    container_name: chroma-lay
     image: ghcr.io/chroma-core/chroma:latest
     environment:
       - IS_PERSISTENT=TRUE
