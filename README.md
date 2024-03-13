@@ -38,7 +38,7 @@ sin tesseract.
 Para lograr que el bot funcione,deberas ir al archivo "Bot_layla_sphere.py" y dentro de el, 
 abre tu terminal(ctrl+ñ) y despues escribir el siguiente comando:
 
-streamlit run chatservice/main.py
+streamlit run layservice/main.py
 
 Esto en cuyo caso el nombre del archivo no cambie conforme pase el tiempo.
 
