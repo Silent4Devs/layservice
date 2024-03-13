@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  lay-chat-app:
+    build:
+      context: "."
+      dockerfile: Dockerfile
+    container_name: lay-chat-app
+    image: langchain-chat-app:latest
+    command: streamlit run main.py --server.port 8080 --server.address 0.0.0.0
+    # volumes:
+    # - .:/app/lay-volume
+    ports:  
+    - 8080:8080
+    networks:
+      - lay-networks
+      
+  chroma-lay:
+    container_name: chroma-lay
+    image: ghcr.io/chroma-core/chroma:latest
+    environment:
+      - IS_PERSISTENT=TRUE
+    volumes:
+      # Default configuration for persist_directory in chromadb/config.py
+      # Currently it's located in "/chroma/chroma/"
+      - chroma-data:/chroma/chroma/
+    ports:
+      - 8000:8000
+    networks:
+      - lay-networks
+
+volumes:
+  chroma-data:
+    driver: local
+
+networks:
+  lay-networks:
+    driver: bridge
