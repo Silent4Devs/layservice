@@ -10,7 +10,7 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings 
 
 
-FILE_LIST = "my_chat_app/archivos.txt"
+FILE_LIST = "chatservice/archivos.txt"
 INDEX_NAME = 'taller'
 
 chroma_client = chromadb.HttpClient(host='localhost', port=8000)
