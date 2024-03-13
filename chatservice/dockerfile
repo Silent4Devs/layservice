@@ -1,5 +1,13 @@
 FROM langchain/langchain
 
+# Install Tesseract OCR and language packs
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    tesseract-ocr-fra \
+    # Add other language packs as needed \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
