@@ -8,7 +8,7 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings 
 
-FILE_LIST = "chatservice/archivos.txt"
+FILE_LIST = "../archivos.txt"
 INDEX_NAME = 'taller'
 
 # Corrected Chroma server hostname and port

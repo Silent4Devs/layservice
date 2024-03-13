@@ -8,11 +8,12 @@ services:
     image: langchain-chat-app:latest
     # command: streamlit run main.py --server.port 8080
     volumes:
-    - ./lay-volume/:/app/lay-volume
+    - .:/app/lay-volume
     ports:  
     - 8080:8080
     networks:
       - lay-networks
+      
   chroma-lay:
     container_name: chroma-lay
     image: ghcr.io/chroma-core/chroma:latest
@@ -28,8 +29,6 @@ services:
       - lay-networks
 
 volumes:
-  lay-volume:
-    driver: local
   chroma-data:
     driver: local
 
