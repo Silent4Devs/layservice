@@ -8,7 +8,7 @@ from domain.memory import clear_history, ask_with_memory
 import os
 
 def run():
-    st.image("my_chat_app/public/s4b_logo.png")
+    st.image("chatservice/public/s4b_logo.png")
     st.subheader(
         "¡Hola usuario!, mi nombre es Lay Sphere🤖, fui diseñada por silent4business para analizar los documentos que me proporciones y me preguntes sobre ellos y te responda con mucho gusto 😀, dicho lo anterior, porfavor..."
     )
