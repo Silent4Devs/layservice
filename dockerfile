@@ -1,24 +1,22 @@
-FROM langchain/langchain
+FROM langchain/langchain AS base
 
 # Install Tesseract OCR and language packs
-RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    tesseract-ocr-eng \
-    tesseract-ocr-fra \
-    # Add other language packs as needed \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+        tesseract-ocr-eng \
+        tesseract-ocr-spa \
+        build-essential \
+        curl \
+        software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    software-properties-common \
-    && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt /app/
 
-COPY requirements.txt .
+RUN pip install -r /app/requirements.txt
+# RUN pip install --upgrade -r /app/requirements.txt
 
-RUN pip install --upgrade -r requirements.txt
-
-COPY . /app
+COPY . /app/
 
 WORKDIR /app
 
@@ -29,6 +27,4 @@ WORKDIR /app
 EXPOSE 8080
 
 HEALTHCHECK CMD curl --fail http://localhost:8080/_stcore/health
-CMD ["streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]
-
-# ENTRYPOINT ["streamlit", "run", "chatservice/main.py", "--server.port=8080", "--server.address=0.0.0.0"]
+# CMD ["streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]

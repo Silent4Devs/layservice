@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     container_name: lay-chat-app
     image: langchain-chat-app:latest
-    # command: streamlit run main.py --server.port 8080
+    command: streamlit run main.py --server.port 8080 --server.address 0.0.0.0
     volumes:
     - .:/app/lay-volume
     ports:  
