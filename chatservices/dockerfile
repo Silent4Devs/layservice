@@ -1,4 +1,5 @@
-FROM langchain/langchain AS base
+#FROM langchain/langchain AS base
+FROM python:3.11-slim-buster as base
 
 # Install Tesseract OCR and language packs
 RUN apt-get update \
