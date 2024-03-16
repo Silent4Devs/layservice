@@ -14,5 +14,5 @@ unstructured_inference
 pdfminer.six
 pinecone-client
 python-dotenv
-pypdf
 sentence_transformers
+pdfplumber
