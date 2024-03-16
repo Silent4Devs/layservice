@@ -18,7 +18,7 @@ RUN pip install -r /app/requirements.txt
 
 COPY . /app/
 
-WORKDIR /app
+WORKDIR /app/
 
 # COPY bot.py .
 # COPY utils.py .
@@ -27,4 +27,5 @@ WORKDIR /app
 EXPOSE 8080
 
 HEALTHCHECK CMD curl --fail http://localhost:8080/_stcore/health
-# CMD ["streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]
+
+CMD ["streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]

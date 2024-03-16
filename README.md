@@ -90,3 +90,10 @@ pip install wikipedia
 pip3 install streamlit
 
 pip install pymupdf
+
+
+####Levantar servicio con docker####
+
+docker compose build 
+docker compose up -d
+

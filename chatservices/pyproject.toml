@@ -1,0 +1,30 @@
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "lay-chat"
+version = "0.1.0"
+description = "Agente de MLL"
+authors = ["john <luis.vargas@silent4business.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+openai = "*"
+langchain = "*"
+chromadb = "*"
+docx2txt = "*"
+pypdf2 = "*"
+streamlit = "*"
+tiktoken = "*"
+unstructured = "*"
+python-pptx = "*"
+pdfminer = "*"
+pdf2image = "*"
+tesseract = "*"
+unstructured_inference = "*"
+pinecone-client = "*"
+python-dotenv = "*"
+sentence-transformers = "*"
+
+[tool.poetry.dev-dependencies]
