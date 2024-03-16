@@ -1,21 +1,21 @@
 version: '3.8'
 services:
-  lay-chat-app:
+  lay-chat:
     build:
       context: "."
       dockerfile: Dockerfile
-    container_name: lay-chat-app
-    image: langchain-chat-app:latest
-    command: streamlit run main.py --server.port 8080 --server.address 0.0.0.0
-    # volumes:
-    # - .:/app/lay-volume
+    container_name: lay-chat
+    #image: lay-chat-app:latest
+    #command: streamlit run main.py --server.port 8080 --server.address 0.0.0.0
+    volumes:
+      - .:/app
     ports:  
-    - 8080:8080
+      - 8080:8080
     networks:
       - lay-networks
       
-  chroma-lay:
-    container_name: chroma-lay
+  chroma-lay-db:
+    container_name: chroma-lay-db
     image: ghcr.io/chroma-core/chroma:latest
     environment:
       - IS_PERSISTENT=TRUE

@@ -1,0 +1,33 @@
+FROM langchain/langchain AS base
+#FROM python:3-slim-buster as base
+
+# Install Tesseract OCR and language packs
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+        tesseract-ocr-eng \
+        tesseract-ocr-spa \
+        build-essential \
+        curl \
+        sqlite3 \
+        software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/
+
+COPY requirements.txt .
+
+#instalation with cache
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir -r requirements.txt
+#without cache
+# RUN pip install -r requirements.txt
+# RUN pip install --upgrade -r /app/requirements.txt
+
+COPY . .
+
+EXPOSE 8080
+
+HEALTHCHECK CMD curl --fail http://localhost:8080/_stcore/health
+
+CMD ["streamlit", "run", "main.py", "--server.port=8080", "--server.address=0.0.0.0"]

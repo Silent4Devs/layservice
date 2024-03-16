@@ -12,7 +12,7 @@ FILE_LIST = "archivos.txt"
 INDEX_NAME = 'taller'
 
 # Corrected Chroma server hostname and port
-chroma_client = chromadb.HttpClient(host='chroma-lay', port=8000)
+chroma_client = chromadb.HttpClient(host='chroma-lay-db', port=8000)
 
 def save_name_files(path, new_files):
     old_files = load_name_files(path)
