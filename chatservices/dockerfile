@@ -1,9 +1,9 @@
 #FROM langchain/langchain AS base
-FROM python:3.11-slim-buster as base
+FROM python:3-slim-buster as base
 
 # Install Tesseract OCR and language packs
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         tesseract-ocr \
         tesseract-ocr-eng \
         tesseract-ocr-spa \
@@ -12,18 +12,14 @@ RUN apt-get update \
         software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/
-
-RUN pip install -r /app/requirements.txt
-# RUN pip install --upgrade -r /app/requirements.txt
-
-COPY . /app/
-
 WORKDIR /app/
 
-# COPY bot.py .
-# COPY utils.py .
-# COPY chains.py .
+COPY requirements.txt .
+
+RUN pip install -r requirements.txt
+# RUN pip install --upgrade -r /app/requirements.txt
+
+COPY . .
 
 EXPOSE 8080
 
