@@ -9,6 +9,7 @@ RUN apt-get update && \
         tesseract-ocr-spa \
         build-essential \
         curl \
+        sqlite3 \
         software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
