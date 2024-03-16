@@ -7,10 +7,10 @@ services:
     container_name: lay-chat
     #image: lay-chat-app:latest
     #command: streamlit run main.py --server.port 8080 --server.address 0.0.0.0
-    # volumes:
-    # - .:/app/lay-volume
+    volumes:
+      - .:/app
     ports:  
-    - 8080:8080
+      - 8080:8080
     networks:
       - lay-networks
       
