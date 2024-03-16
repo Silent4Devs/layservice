@@ -7,13 +7,6 @@
 
 Además, ¿sabías que ChatGPT puede mantener conversaciones con documentos? En este taller de Python, descubriremos cómo hacerlo posible gracias a ChromaDB. Olvídate de las limitaciones, ahora podrás conversar y explorar tus documentos de una manera completamente nueva.
 
-
-Para desarrollar esta aplicación necesitaremos:
-* Docker
-* ChatGPT API
-* Streamlit
-
-
 ## ¿Cómo funciona?
 1. Divide documento en cachos (o chunks)
 2. Crea los embeddings de los cachos de texto
