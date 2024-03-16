@@ -1,5 +1,8 @@
 openai
 langchain
+langchain-community
+langchain-core
+langchain-cli
 chromadb
 docx2txt
 pypdf
@@ -14,5 +17,5 @@ unstructured_inference
 pdfminer.six
 pinecone-client
 python-dotenv
-pypdf
 sentence_transformers
+pdfplumber
