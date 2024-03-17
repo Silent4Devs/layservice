@@ -1,9 +1,14 @@
 openai
 langchain
 langchain-community
+langchain-openai
+langchain-google-genai
+langchain-anthropic
+langchain-fireworks
 langchain-core
 langchain-cli
 chromadb
+chromadb-client
 docx2txt
 pypdf
 streamlit
@@ -19,3 +24,4 @@ pinecone-client
 python-dotenv
 sentence_transformers
 pdfplumber
+beautifulsoup4
