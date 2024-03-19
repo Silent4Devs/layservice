@@ -1,9 +1,16 @@
 import streamlit as st
 import os
+
 from domain.utils import *
 from langchain.embeddings import HuggingFaceEmbeddings 
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.question_answering import load_qa_chain
+from langchain_community.llms import OpenAI
+from dotenv import load_dotenv, find_dotenv
+from langchain.prompts import PromptTemplate
+
+load_dotenv(find_dotenv(), override=True)
+#openai_api_key = config("OPENAI_API_KEY")
 
 def run():
 
@@ -55,6 +62,19 @@ def run():
             llm = ChatOpenAI(model_name='gpt-3.5-turbo')
             chain = load_qa_chain(llm, chain_type="stuff")
             respuesta = chain.run(input_documents=docs, question=user_question)
+
+            prompt_template = """
+        Eres una asistente virtual llamada Lay, eres cómica, carismatica, interesante y amable, no menciones tus cualidades, que apoya encontrando información, 
+        además de dar sugerencias en base a la información que se te proporcione y contestando preguntas: {question}. 
+        """
+
+            prompt = PromptTemplate.from_template(template=prompt_template)
+
+            prompt_formatted_str = prompt.format(question=user_question)
+
+            prediction = llm.invoke(prompt_formatted_str)
+
+            respuesta += "\n" + str(prediction)
 
             st.write(respuesta)
 
