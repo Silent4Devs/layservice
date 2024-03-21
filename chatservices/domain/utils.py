@@ -1,18 +1,26 @@
 import os
 import streamlit as st
-
+import pdfplumber
 import chromadb
 import tempfile
+from PIL import Image
+import pytesseract
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import PyPDFLoader
 from langchain.vectorstores import Chroma
-from langchain.embeddings import HuggingFaceEmbeddings 
+from langchain.embeddings import HuggingFaceEmbeddings
+from pdf2image import convert_from_path 
+
+pytesseract.pytesseract.tesseract_cmd = r"C:/Program Files/Tesseract-OCR/tesseract.exe"
+
 
 FILE_LIST = "archivos.txt"
 INDEX_NAME = 'taller'
 
 # Corrected Chroma server hostname and port
 chroma_client = chromadb.HttpClient(host='chroma-lay-db', port=8000)
+
+
 
 def save_name_files(path, new_files):
     old_files = load_name_files(path)
@@ -37,18 +45,85 @@ def clean_files(path):
     collection = chroma_client.create_collection(name=INDEX_NAME)
     return True
 
-def text_to_chromadb(pdf):
+import os
+import tempfile
+
+def text_to_chromadb(file):
     temp_dir = tempfile.TemporaryDirectory()
-    temp_filepath = os.path.join(temp_dir.name, pdf.name)
+    temp_filepath = os.path.join(temp_dir.name, file.name)
     with open(temp_filepath, "wb") as f:
-        f.write(pdf.getvalue())
+        f.write(file.getvalue())
 
-    loader = PyPDFLoader(temp_filepath)
-    text = loader.load()
+    notas, extension = os.path.splitext(file.name)
 
-    with st.spinner(f'Creating embedding for file: {pdf.name}'):
-        create_embeddings(pdf.name, text)
+    def load_pdf(file_path):
+        from langchain.document_loaders import PyPDFLoader
+        from PyPDF2 import PdfFileReader
+        import pytesseract
+        from PIL import Image
+        import io
+
+        print(f"Loading {file_path}")
+        loader = PyPDFLoader(file_path)
+        try:
+            text = loader.load()
+        except Exception as e:
+            pdf_reader = PdfFileReader(open(file_path, 'rb'))
+        text = ""
+        for page_num in range(pdf_reader.numPages):
+            page = pdf_reader.getPage(page_num)
+            try:
+                image_blob = page.extractText()
+                image = Image.open(io.BytesIO(image_blob))
+                ocr_text = pytesseract.image_to_string(image)
+                text += ocr_text
+            except Exception as e:
+                print(f"Failed to perform OCR on page {page_num}: {e}")
+        if not text:
+            raise ValueError("Failed to extract text using PyPDF2 and OCR.")
+        
+        return loader.load()
+    
+    def load_docx(file_path):
+        from langchain.document_loaders import Docx2txtLoader
+        print(f"Loading {file_path}")
+        loader = Docx2txtLoader(file_path)
+        return loader.load()
+
+    def load_txt(file_path):
+        from langchain.document_loaders import TextLoader
+        print(f"Loading {file_path}")
+        loader = TextLoader(file_path)
+        return loader.load()
+
+    def load_pptx(file_path):
+        from langchain.document_loaders import UnstructuredPowerPointLoader
+        print(f"Loading {file_path}")
+        loader = UnstructuredPowerPointLoader(file_path)
+        return loader.load()
+    
+    def load_image(file_path):
+        from langchain.document_loaders.image import UnstructuredImageLoader
+        print(f"Loading {file_path}")
+        loader = UnstructuredImageLoader(file_path)
+        return loader.load()
+
+    if extension == ".pdf":
+        text = load_pdf(temp_filepath)
+    elif extension == ".docx":
+        text = load_docx(temp_filepath)
+    elif extension == ".txt":
+        text = load_txt(temp_filepath)
+    elif extension == ".pptx":
+        text = load_pptx(temp_filepath)
+    else:
+        # Handle other file formats or raise an error
+        raise ValueError("Unsupported file format")
+
+    with st.spinner(f'Creating embedding for file: {file.name}'):
+        create_embeddings(file.name, text)
     return True
+
 
 def create_embeddings(file_name, text):
     print(f"Creating embeddings for the file: {file_name}")

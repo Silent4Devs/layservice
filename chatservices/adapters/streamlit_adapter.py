@@ -61,7 +61,7 @@ def run():
             docs = vstore.similarity_search(user_question, 3)
             llm = ChatOpenAI(model_name='gpt-3.5-turbo')
             chain = load_qa_chain(llm, chain_type="stuff")
-            respuesta = chain.run(input_documents=docs, question=user_question)
+            respuesta_chain = chain.run(input_documents=docs, question=user_question)
 
             prompt_template = """
         Eres una asistente virtual llamada Lay, eres cómica, carismatica, interesante y amable, no menciones tus cualidades, que apoya encontrando información, 
@@ -74,9 +74,9 @@ def run():
 
             prediction = llm.invoke(prompt_formatted_str)
 
-            respuesta += "\n" + str(prediction)
+            respuesta_final, chat_history = (str(respuesta_chain), prediction)
 
-            st.write(respuesta)
+            st.write(respuesta_final)
 
 
     
