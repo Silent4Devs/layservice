@@ -4,7 +4,9 @@ from domain.utils import *
 from langchain.embeddings import HuggingFaceEmbeddings 
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.question_answering import load_qa_chain
+from dotenv import load_dotenv, find_dotenv
 
+load_dotenv(find_dotenv(), override=True)
 def run():
 
     st.set_page_config('preguntaDOC')
