@@ -13,6 +13,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 import fitz  # PyMuPDF
 import pytesseract
 from PIL import Image
+from langchain.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader, UnstructuredPowerPointLoader, UnstructuredImageLoader
 
 FILE_LIST = "archivos.txt"
 INDEX_NAME = 'taller'
@@ -59,71 +60,103 @@ def extract_text_from_image(image):
     """
     return pytesseract.image_to_string(image)
 
-def text_to_chromadb(pdf):
+def text_to_chromadb(file):
     temp_dir = tempfile.TemporaryDirectory()
-    temp_filepath = os.path.join(temp_dir.name, pdf.name)
+    temp_filepath = os.path.join(temp_dir.name, file.name)
     with open(temp_filepath, "wb") as f:
-        f.write(pdf.getvalue())
+        f.write(file.getvalue())
 
-    if is_scanned_pdf(temp_filepath):
-        st.write("El archivo PDF contiene hojas escaneadas.")
-        extracted_text = ""
-        doc = fitz.open(temp_filepath)
-        for page_number, page in enumerate(doc):
-            image_list = page.get_images()
-            if image_list:
-                st.write(f"Extrayendo texto de las imágenes en la página {page_number + 1}")
-                for image_index, img in enumerate(image_list):
-                    xref = img[0]
-                    base_image = doc.extract_image(xref)
-                    image_bytes = base_image["image"]
-                    image = Image.open(io.BytesIO(image_bytes))
-                    extracted_text += extract_text_from_image(image)
-        st.write("Texto extraído de las imágenes:", extracted_text)
+    if file.type == "application/pdf":
+        if is_scanned_pdf(temp_filepath):
+            st.write("El archivo PDF contiene hojas escaneadas.")
+            extracted_text = ""
+            doc = fitz.open(temp_filepath)
+            for page_number, page in enumerate(doc):
+                image_list = page.get_images()
+                if image_list:
+                    st.write(f"Extrayendo texto de las imágenes en la página {page_number + 1}")
+                    for image_index, img in enumerate(image_list):
+                        xref = img[0]
+                        base_image = doc.extract_image(xref)
+                        image_bytes = base_image["image"]
+                        image = Image.open(io.BytesIO(image_bytes))
+                        extracted_text += extract_text_from_image(image)
+            st.write("Texto extraído de las imágenes:", extracted_text)
 
-        new_pdf_path = os.path.join(temp_dir.name, "text_extracted.pdf")
-        c = canvas.Canvas(new_pdf_path, pagesize=letter)
-        c.drawString(100, 750, extracted_text)
-        c.save()
+            new_pdf_path = os.path.join(temp_dir.name, "text_extracted.pdf")
+            c = canvas.Canvas(new_pdf_path, pagesize=letter)
+            c.drawString(100, 750, extracted_text)
+            c.save()
 
-        loader = PyPDFLoader(new_pdf_path)
-        text = loader.load()
-        create_embeddings(pdf.name, text)
+            loader = PyPDFLoader(new_pdf_path)
+            text = loader.load()
+            create_embeddings(file.name, text)
 
 
+            return True
+
+        else:
+            st.write("El archivo PDF no contiene hojas escaneadas.")
+            loader = PyPDFLoader(temp_filepath)
+            text = loader.load()
+            create_embeddings(file.name, text)
+
+            return True
+        
+    elif file.type == "text/plain":
+        # Manejar archivos de texto (txt)
+        with open(temp_filepath, "r", encoding="utf-8") as f:
+            text = f.read()
+        create_embeddings(file.name, text)
+        return True
+
+    elif file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        # Manejar archivos de Word (docx)
+        from langchain.document_loaders import word_document
+        doc = word_document(temp_filepath)
+        text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+        create_embeddings(file.name, text)
+        return True
+
+    elif file.type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+        # Manejar archivos de PowerPoint (pptx)
+        from pptx import Presentation
+        prs = Presentation(temp_filepath)
+        text = "\n".join([slide.text for slide in prs.slides])
+        create_embeddings(file.name, text)
         return True
 
     else:
-        st.write("El archivo PDF no contiene hojas escaneadas.")
-        loader = PyPDFLoader(temp_filepath)
-        text = loader.load()
-        create_embeddings(pdf.name, text)
+        st.write(f"Tipo de archivo no compatible: {file.type}")
+        return False
 
-        return True
+
+
+
 
 
 def create_embeddings(file_name, text):
-    st.write(f"Creating embeddings for the file: {file_name}")
+        st.write(f"Creating embeddings for the file: {file_name}")
 
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=100,
-        length_function=len
-        )        
-    
-    chunks = text_splitter.split_documents(text)
-
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-        )
-    
-    Chroma.from_documents(
-        chunks,
-        embeddings,   
-        client=chroma_client,
-        collection_name=INDEX_NAME)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=800,
+            chunk_overlap=100,
+            length_function=len
+            )        
         
-    return True
+        chunks = text_splitter.split_documents(text)
+
+        embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+            )
+        
+        Chroma.from_documents(
+            chunks,
+            embeddings,   
+            client=chroma_client,
+            collection_name=INDEX_NAME)
+            
+        return True
 
 def log_interaction(question, answer):
     """

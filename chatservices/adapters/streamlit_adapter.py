@@ -13,14 +13,14 @@ def run():
 
     st.set_page_config('preguntaDOC')
     st.header("¡Hola usuario!, mi nombre es Lay Sphere🤖, fui diseñada por silent4business para analizar los documentos que me proporciones y me preguntes sobre ellos y te responda con mucho gusto 😀, dicho lo anterior, porfavor...")
-
+        
+    archivos = load_name_files(FILE_LIST)
 
     with st.sidebar:
-        
-        archivos = load_name_files(FILE_LIST)
+
         files_uploaded = st.file_uploader(
             "Carga tu archivo",
-            type="pdf",
+            type="pdf, txt, pptx, docx, xlsx, jpg, jpeg, png",
             accept_multiple_files=True
             )
         
