@@ -5,6 +5,8 @@ import streamlit as st
 import chromadb
 import tempfile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 from langchain.document_loaders import PyPDFLoader
 from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings 
@@ -78,6 +80,19 @@ def text_to_chromadb(pdf):
                     image = Image.open(io.BytesIO(image_bytes))
                     extracted_text += extract_text_from_image(image)
         st.write("Texto extraído de las imágenes:", extracted_text)
+
+        new_pdf_path = os.path.join(temp_dir.name, "text_extracted.pdf")
+        c = canvas.Canvas(new_pdf_path, pagesize=letter)
+        c.drawString(100, 750, extracted_text)
+        c.save()
+
+        loader = PyPDFLoader(new_pdf_path)
+        text = loader.load()
+        create_embeddings(pdf.name, text)
+
+
+        return True
+
     else:
         st.write("El archivo PDF no contiene hojas escaneadas.")
         loader = PyPDFLoader(temp_filepath)
