@@ -78,48 +78,17 @@ def text_to_chromadb(pdf):
                     image = Image.open(io.BytesIO(image_bytes))
                     extracted_text += extract_text_from_image(image)
         st.write("Texto extraído de las imágenes:", extracted_text)
-        create_embeddings_text(pdf.name, extracted_text) 
     else:
         st.write("El archivo PDF no contiene hojas escaneadas.")
         loader = PyPDFLoader(temp_filepath)
-        scanned_document = loader.load()
-        create_embeddings(pdf.name, scanned_document)  # Llamar a create_embeddings con el documento
-        
+        text = loader.load()
+        create_embeddings(pdf.name, text)
+
         return True
 
 
-def create_embeddings_text(file_name, text):
-    print(f"Creating embeddings for the file: {file_name}")
-
-    # Inicializar RecursiveCharacterTextSplitter
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=800,
-        chunk_overlap=100,
-        length_function=len
-    )
-
-    # Dividir el texto en fragmentos
-    chunks = [text]
-
-    # Inicializar HuggingFaceEmbeddings
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-    )
-
-    # Crear embeddings para el texto y almacenarlos en Chroma
-    Chroma.from_documents(
-        chunks,
-        embeddings,
-        client=chroma_client,
-        collection_name=INDEX_NAME
-    )
-
-    return True
-
-
-
 def create_embeddings(file_name, text):
-    print(f"Creating embeddings for the file: {file_name}")
+    st.write(f"Creating embeddings for the file: {file_name}")
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
