@@ -124,3 +124,21 @@ def create_embeddings(file_name, text):
         collection_name=INDEX_NAME)
         
     return True
+
+def log_interaction(question, answer):
+    """
+    Registra la pregunta realizada por el usuario y su respuesta asociada en un archivo de registro.
+    """
+    with open("registro_preguntas.txt", "a") as file:
+        file.write(f"Pregunta: {question}\n")
+        file.write(f"Respuesta: {answer}\n\n")
+        
+
+def buscar_respuesta(pregunta):
+    with open("registro_preguntas.txt", "r") as file:
+        lines = file.readlines()
+        for i in range(0, len(lines), 3):  # Buscar en el archivo línea por línea
+            if lines[i].strip() == f"Pregunta: {pregunta}":  # Si se encuentra la pregunta
+                return lines[i + 1].strip()  # Devolver la respuesta asociada
+    return None  # Si la pregunta no se encuentra en el archivo
+
