@@ -46,8 +46,7 @@ def text_to_chromadb(pdf):
     loader = PyPDFLoader(temp_filepath)
     text = loader.load()
 
-    with st.spinner(f'Creating embedding for file: {pdf.name}'):
-        create_embeddings(pdf.name, text)
+    create_embeddings(pdf.name, text)
     return True
 
 def create_embeddings(file_name, text):
