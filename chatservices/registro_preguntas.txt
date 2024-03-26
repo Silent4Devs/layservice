@@ -1,17 +1,2 @@
-quienes firmaron la requisicion
-quienes firmaron la requisicion nesecito el nombre de todos
-Pregunta: quien es el solicitante
-Respuesta: El solicitante es Karen Marai Rodriguez Galvez, según la información proporcionada en el documento.
 
-Pregunta: quien es el solicitante
-Respuesta: El solicitante es Karen Marai Rodriguez Galvez.
-
-Pregunta: de que habla el contrato
-Respuesta: El fragmento del contrato menciona varios aspectos y cláusulas relacionadas con la prestación de servicios entre un proveedor y el Instituto Nacional de Estadística y Geografía. Algunos de los puntos tratados incluyen la modificación de fechas o plazos de prestación de servicios, la garantía de cumplimiento de obligaciones mediante fianza o cheque certificado, la prohibición de ceder derechos y obligaciones sin consentimiento, y la posibilidad de incrementar la cantidad de servicios solicitados originalmente dentro de ciertos límites establecidos. En resumen, el contrato aborda temas como modificaciones, garantías, restricciones y posibles incrementos en los servicios contratados.
-
-Pregunta: quien firmo la requisicion
-Respuesta: No hay información específica en el texto proporcionado que indique quién firmó la requisición. Por lo tanto, no se puede determinar quién firmó la requisición basándose en este texto.
-
-Pregunta: quien es el solicitante
-Respuesta: El solicitante en este contexto es el "Instituto Nacional de Estadística y Geografía".
 
