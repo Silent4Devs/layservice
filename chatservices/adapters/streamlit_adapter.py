@@ -4,7 +4,11 @@ from domain.utils import *
 from langchain.embeddings import HuggingFaceEmbeddings 
 from langchain.chat_models import ChatOpenAI
 from langchain.chains.question_answering import load_qa_chain
+from dotenv import load_dotenv, find_dotenv
+from domain.utils import log_interaction
 
+
+load_dotenv(find_dotenv(), override=True)
 def run():
 
     st.set_page_config('preguntaDOC')
@@ -42,6 +46,7 @@ def run():
     if archivos:
         user_question = st.text_input("Pregunta:")
         if user_question:
+        # Resto de tu código para procesar la pregunta
             os.environ["OPENAI_API_KEY"]
             embeddings = HuggingFaceEmbeddings(
                 model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
@@ -55,6 +60,13 @@ def run():
             llm = ChatOpenAI(model_name='gpt-3.5-turbo')
             chain = load_qa_chain(llm, chain_type="stuff")
             respuesta = chain.run(input_documents=docs, question=user_question)
+
+            respuesta_guardada = buscar_respuesta(user_question)
+            
+            if respuesta_guardada:
+                st.write(respuesta_guardada)
+            else:
+                log_interaction(user_question, respuesta)  # Registrar la pregunta y la respuesta
 
             st.write(respuesta)
 

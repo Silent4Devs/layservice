@@ -1,12 +1,18 @@
 import os
+import io
 import streamlit as st
 
 import chromadb
 import tempfile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 from langchain.document_loaders import PyPDFLoader
 from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings 
+import fitz  # PyMuPDF
+import pytesseract
+from PIL import Image
 
 FILE_LIST = "archivos.txt"
 INDEX_NAME = 'taller'
@@ -37,21 +43,67 @@ def clean_files(path):
     collection = chroma_client.create_collection(name=INDEX_NAME)
     return True
 
+def is_scanned_pdf(pdf_path):
+    """
+    Determina si un archivo PDF contiene hojas escaneadas
+    """
+    doc = fitz.open(pdf_path)
+    for page in doc:
+        if page.get_text() == "":
+            return True  # Si alguna página no tiene texto, consideramos que es escaneada
+    return False
+
+def extract_text_from_image(image):
+    """
+    Extrae texto de una imagen utilizando OCR
+    """
+    return pytesseract.image_to_string(image)
+
 def text_to_chromadb(pdf):
     temp_dir = tempfile.TemporaryDirectory()
     temp_filepath = os.path.join(temp_dir.name, pdf.name)
     with open(temp_filepath, "wb") as f:
         f.write(pdf.getvalue())
 
-    loader = PyPDFLoader(temp_filepath)
-    text = loader.load()
+    if is_scanned_pdf(temp_filepath):
+        st.write("El archivo PDF contiene hojas escaneadas.")
+        extracted_text = ""
+        doc = fitz.open(temp_filepath)
+        for page_number, page in enumerate(doc):
+            image_list = page.get_images()
+            if image_list:
+                st.write(f"Extrayendo texto de las imágenes en la página {page_number + 1}")
+                for image_index, img in enumerate(image_list):
+                    xref = img[0]
+                    base_image = doc.extract_image(xref)
+                    image_bytes = base_image["image"]
+                    image = Image.open(io.BytesIO(image_bytes))
+                    extracted_text += extract_text_from_image(image)
+        st.write("Texto extraído de las imágenes:", extracted_text)
 
-    with st.spinner(f'Creating embedding for file: {pdf.name}'):
+        new_pdf_path = os.path.join(temp_dir.name, "text_extracted.pdf")
+        c = canvas.Canvas(new_pdf_path, pagesize=letter)
+        c.drawString(100, 750, extracted_text)
+        c.save()
+
+        loader = PyPDFLoader(new_pdf_path)
+        text = loader.load()
         create_embeddings(pdf.name, text)
-    return True
+
+
+        return True
+
+    else:
+        st.write("El archivo PDF no contiene hojas escaneadas.")
+        loader = PyPDFLoader(temp_filepath)
+        text = loader.load()
+        create_embeddings(pdf.name, text)
+
+        return True
+
 
 def create_embeddings(file_name, text):
-    print(f"Creating embeddings for the file: {file_name}")
+    st.write(f"Creating embeddings for the file: {file_name}")
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,
@@ -72,3 +124,21 @@ def create_embeddings(file_name, text):
         collection_name=INDEX_NAME)
         
     return True
+
+def log_interaction(question, answer):
+    """
+    Registra la pregunta realizada por el usuario y su respuesta asociada en un archivo de registro.
+    """
+    with open("registro_preguntas.txt", "a") as file:
+        file.write(f"Pregunta: {question}\n")
+        file.write(f"Respuesta: {answer}\n\n")
+        
+
+def buscar_respuesta(pregunta):
+    with open("registro_preguntas.txt", "r") as file:
+        lines = file.readlines()
+        for i in range(0, len(lines), 3):  # Buscar en el archivo línea por línea
+            if lines[i].strip() == f"Pregunta: {pregunta}":  # Si se encuentra la pregunta
+                return lines[i + 1].strip()  # Devolver la respuesta asociada
+    return None  # Si la pregunta no se encuentra en el archivo
+
