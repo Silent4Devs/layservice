@@ -25,3 +25,5 @@ python-dotenv
 sentence_transformers
 pdfplumber
 beautifulsoup4
+psycopg2-binary
+sqlalchemy
