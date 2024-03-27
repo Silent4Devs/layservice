@@ -7,13 +7,12 @@ import tempfile
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
-from langchain.document_loaders import PyPDFLoader
+from langchain.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader, UnstructuredPowerPointLoader, UnstructuredImageLoader
 from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings 
 import fitz  # PyMuPDF
 import pytesseract
 from PIL import Image
-from langchain.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader, UnstructuredPowerPointLoader, UnstructuredImageLoader
 
 FILE_LIST = "archivos.txt"
 INDEX_NAME = 'taller'
@@ -94,41 +93,44 @@ def text_to_chromadb(file):
 
 
             return True
+        
+        elif file.type == "text/plain":
+            # Manejar archivos de texto (txt)
+            with open(temp_filepath, "r", encoding="utf-8") as f:
+                text = f.read()
+            create_embeddings(file.name, text)
+            return True
+        
+        elif file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            # Manejar archivos de Word (docx)
+            from langchain.document_loaders import word_document
+            doc = word_document(temp_filepath)
+            text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
+            create_embeddings(file.name, text)
+            return True
 
-        else:
-            st.write("El archivo PDF no contiene hojas escaneadas.")
+        elif file.type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+            # Manejar archivos de PowerPoint (pptx)
+            from pptx import Presentation
+            prs = Presentation(temp_filepath)
+            text = "\n".join([slide.text for slide in prs.slides])
+            create_embeddings(file.name, text)
+            return True
+
+        elif st.write("El archivo PDF no contiene hojas escaneadas."):
             loader = PyPDFLoader(temp_filepath)
             text = loader.load()
             create_embeddings(file.name, text)
 
             return True
-        
-    elif file.type == "text/plain":
-        # Manejar archivos de texto (txt)
-        with open(temp_filepath, "r", encoding="utf-8") as f:
-            text = f.read()
-        create_embeddings(file.name, text)
-        return True
+        else:
+            st.write(f"Tipo de archivo no compatible: {file.type}")
+            return False
+    
 
-    elif file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        # Manejar archivos de Word (docx)
-        from langchain.document_loaders import word_document
-        doc = word_document(temp_filepath)
-        text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
-        create_embeddings(file.name, text)
-        return True
+    
 
-    elif file.type == "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-        # Manejar archivos de PowerPoint (pptx)
-        from pptx import Presentation
-        prs = Presentation(temp_filepath)
-        text = "\n".join([slide.text for slide in prs.slides])
-        create_embeddings(file.name, text)
-        return True
-
-    else:
-        st.write(f"Tipo de archivo no compatible: {file.type}")
-        return False
+    
 
 
 

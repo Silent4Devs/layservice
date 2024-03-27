@@ -25,10 +25,10 @@ def run():
             )
         
         if st.button('Procesar'):
-            for pdf in files_uploaded:
-                if pdf is not None and pdf.name not in archivos:
-                    archivos.append(pdf.name)
-                    text_to_chromadb(pdf)
+            for file in files_uploaded:
+                if file is not None and file.name not in archivos:
+                    archivos.append(file.name)
+                    text_to_chromadb(file)
 
             archivos = save_name_files(FILE_LIST, archivos)
 

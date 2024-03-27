@@ -25,3 +25,5 @@ python-dotenv
 sentence_transformers
 pdfplumber
 beautifulsoup4
+PyMuPDF
+reportlab
