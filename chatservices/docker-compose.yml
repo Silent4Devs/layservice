@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   lay-chat:
     build:
@@ -9,11 +9,11 @@ services:
     #command: streamlit run main.py --server.port 8080 --server.address 0.0.0.0
     volumes:
       - .:/app
-    ports:  
+    ports:
       - 8080:8080
     networks:
       - lay-networks
-      
+
   chroma-lay-db:
     container_name: chroma-lay-db
     image: ghcr.io/chroma-core/chroma:latest
@@ -28,10 +28,49 @@ services:
     networks:
       - lay-networks
 
-volumes:
-  chroma-data:
-    driver: local
+  postgres-lay:
+    image: postgres:15-alpine
+    container_name: postgres-lay
+    restart: unless-stopped
+    tty: true
+    volumes:
+      # - ./infra/postgres/data:/var/lib/postgresql/data #localpath
+      - lay-db-data:/var/lib/postgresql/data
+      - ./infra/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    environment:
+      - POSTGRES_USER=homestead
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=homestead
+    ports:
+      - "5432:5432"
+    networks:
+      - lay-networks
+    mem_limit: 6g
+
+  pgadmin-lay:
+    depends_on:
+      - postgres-lay
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5480:80"
+    environment:
+      - PGADMIN_DEFAULT_PASSWORD=secret
+      - PGADMIN_DEFAULT_EMAIL=soporte.desarrollo@silent4business.com
+    restart: unless-stopped
+    tty: true
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - lay-networks
 
 networks:
   lay-networks:
     driver: bridge
+
+volumes:
+  chroma-data:
+    driver: local
+  lay-db-data:
+    driver: local
+  pgadmin-data:
+    driver: local
